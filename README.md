@@ -1,4 +1,4 @@
-# k8sawsnodeportmgmt
+# awsnodeportmgmt
 project to automate the update of NLB and the update of Security Group with added/deleted ports 
 
 
