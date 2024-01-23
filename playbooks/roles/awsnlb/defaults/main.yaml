@@ -1,0 +1,15 @@
+vpc_id: $VPC_ID
+region: $AWS_DEFAULT_REGION
+access_key: $AWS_ACCESS_KEY_ID
+secret_key: $AWS_SECRET_ACCESS_KEY
+subnets:
+- $SUBNET1
+- $SUBNET2
+- $SYBNET3
+worker1: $WORKER1
+worker2: $WORKER2
+worker3: $WORKER3
+workercidr: "0.0.0.0/0"
+ports:
+- 31300
+- 31628

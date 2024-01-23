@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodeport
+  namespace: rocko
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nodeport
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nodeport
+    spec:
+      containers:
+      - args:
+        - infinity
+        command:
+        - sleep
+        env:
+        - name: HOME
+          value: /home/app/
+        - name: AWS_ACCESS_KEY_ID
+          value: 
+        - name: AWS_SECRET_ACCESS_KEY
+          value: 
+        - name: AWS_DEFAULT_REGION
+          value: us-east-1
+        - name: VPC_ID
+          value:
+        - name: SUBNET1
+          value:
+        - name: SUBNET2
+          value:
+        - name: SUBNET3
+          value: 
+        - name: WORKER1
+          value:
+        - name: WORKER2
+          value:
+        - name: WORKER3
+          value:
+        image: quay.io/grakover/nodeports:v3
+        imagePullPolicy: IfNotPresent
+        name: container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - name: inventory
+          mountPath: /home/app/inventories
+      volumes:
+      - name: inventory
+        configMap:
+          name: inventory
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

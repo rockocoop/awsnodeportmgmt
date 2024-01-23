@@ -1,0 +1,16 @@
+---
+
+- hosts: localhost
+  gather_facts: false
+
+
+  tasks:
+
+
+  - name: create node port list
+    shell: oc get svc -A|grep -i nodeport|awk '{print "oc get svc -o json "$2" -n "$1" |jq '\''.spec.ports | .[] | .nodePort'\''"}'|bash
+    register: ports
+
+  - name: print ports
+    debug:
+      msg: "{{ ports.stdout_lines }}"

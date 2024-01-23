@@ -1,0 +1,96 @@
+---
+- name: set facts for aws connection
+  set_fact:
+    access_key: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
+    secret_key: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
+    region: "{{ lookup('env','AWS_DEFAULT_REGION') }}"
+    vpc_id: "{{ lookup('env','VPC_ID') }}"
+    subnets: "[ '{{lookup('env','SUBNET1')}}', '{{lookup('env','SUBNET2')}}', '{{lookup('env','SUBNET3')}}']"
+    worker1: "{{ lookup('env','WORKER1') }}"
+    worker2: "{{ lookup('env','WORKER2') }}" 
+    worker3: "{{ lookup('env','WORKER3') }}"
+      
+- name: create node port list
+  shell: oc get svc -A|grep -i nodeport|awk '{print "oc get svc -o json "$2" -n "$1" |jq '\''.spec.ports | .[] | .nodePort'\''"}'|bash
+  register: ports
+  changed_when: 1 == 2
+
+- name: set null list for listeners
+  set_fact:
+    listeners: []
+
+- name: set targetname prefix
+  set_fact:
+    listeners: "{{listeners + [stringlist]}}"
+  vars:
+    stringlist: {"DefaultActions": [{"TargetGroupName": "targetgroup-{{item}}","Type": "forward"}],"Port": "{{item}}","Protocol": "TCP"} 
+  loop: "{{ports.stdout_lines}}"
+
+- name: Create target group
+  community.aws.elb_target_group:
+    name: "targetgroup-{{item}}"
+    protocol: tcp
+    port: "{{ item }}"
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    access_key: "{{ access_key }}"
+    secret_key: "{{ secret_key }}"
+    targets:
+      - Id: "{{ worker1 }}"
+        Port: "{{ item }}"
+      - Id: "{{ worker2 }}"
+        Port: "{{ item }}"
+      - Id: "{{ worker3 }}"
+        Port: "{{ item }}"
+    state: present
+  loop: "{{ ports.stdout_lines }}"
+
+
+- name: Create an ELB with listener
+  community.aws.elb_network_lb:
+    name: nodeports
+    region: "{{ region }}"
+    access_key: "{{ access_key }}"
+    secret_key: "{{ secret_key }}"
+    subnets: "{{subnets}}"
+    listeners: "{{ listeners }}"
+    state: present
+
+- name: Update Security NodePorts 
+  amazon.aws.ec2_security_group:
+    name: "nodeports"
+    description: sg with rule descriptions
+    vpc_id: "{{ vpc_id }}"
+    region: "{{ region }}"
+    access_key: "{{ access_key }}"
+    secret_key: "{{ secret_key }}"
+    rules:
+      - proto: tcp
+        ports: "{{ ports.stdout_lines }}"
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: nodeports.stdout_lines
+
+- name: Gather information about all target groups
+  community.aws.elb_target_group_info:
+  register: targetgroups
+
+- name: print nodeport target groups
+  debug:
+    msg: "{{item.target_group_name}}"
+  loop: "{{targetgroups.target_groups}}"
+  when: "'targetgroup' in item.target_group_name"
+
+- name: set targetname prefix
+  set_fact:
+    prefix: "targetgroup-"
+
+- name: create targetgroup names list
+  set_fact:
+    targetgroupnames: "{{ [prefix] | product(ports.stdout_lines) | map('join') | list }}"
+
+- name: delete target groups
+  community.aws.elb_target_group:
+    name: "{{ item.target_group_name }}"
+    state: absent
+  when: "item.target_group_name not in targetgroupnames and 'targetgroup' in item.target_group_name"
+  loop: "{{targetgroups.target_groups}}"
