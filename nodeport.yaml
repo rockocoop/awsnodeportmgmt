@@ -49,7 +49,7 @@ spec:
           value:
         - name: WORKER3
           value:
-        image: quay.io/grakover/nodeports:v7
+        image: quay.io/grakover/nodeports:v10
         imagePullPolicy: IfNotPresent
         name: container
         resources: {}

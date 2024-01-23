@@ -21,6 +21,9 @@ The following environmental variables must be defined in nodeports.yaml:
 Create service account "nodeports" and it give it the following permissions:
 oc adm policy add-cluster-role-to-user view -z nodeports -n <namespace>
 
+Create security group nodeports
+Create NLB nodeports and assign the SG to the NLB
+Assign the SG to the worker nodes you chose earlier/above
 
 apply nodeports.yaml
 
@@ -33,3 +36,4 @@ ansible-playbook run.yaml
 
 
 Ideally this should be turned into a cronjob that runs frequently
+You can replace command with ansible-playbook and args with /home/app/awsnodeportmgmt/playbooks/run.yaml
