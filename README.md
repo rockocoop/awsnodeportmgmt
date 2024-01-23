@@ -19,7 +19,7 @@ The following environmental variables must be defined in nodeports.yaml:
 - WORKER3
 
 Create service account "nodeports" and it give it the following permissions:
-oc adm policy add-cluster-role-to-user view -z nodeports -n <namespace>
+oc adm policy add-cluster-role-to-user view -z nodeports -n namespace
 
 Create security group nodeports
 Create NLB nodeports and assign the SG to the NLB
