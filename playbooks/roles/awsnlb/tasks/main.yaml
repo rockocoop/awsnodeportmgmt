@@ -59,7 +59,7 @@
 - name: Update Security NodePorts 
   amazon.aws.ec2_security_group:
     name: "nodeports"
-    description: sg with rule descriptions
+    description: nodeports
     vpc_id: "{{ vpc_id }}"
     region: "{{ region }}"
     access_key: "{{ access_key }}"
