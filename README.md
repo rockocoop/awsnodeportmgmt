@@ -6,7 +6,7 @@ project to automate the update of NLB and the update of Security Group with adde
 2. create/update/delete target group
 3. create/update security group
 
-The following environmental variables must be defined:
+The following environmental variables must be defined in nodeports.yaml:
 - AWS_ACCESS_KEY_ID
 - AWS_SECRET_ACCESS_KEY
 - AWS_DEFAULT_REGION
@@ -18,10 +18,9 @@ The following environmental variables must be defined:
 - WORKER2
 - WORKER3
 
+Create service account "nodeports" and it give it the following permissions:
+oc adm policy add-cluster-role-to-user view -z nodeports -n <namespace>
 
 
+apply nodeports.yaml
 
-https://docs.ansible.com/ansible/latest/collections/community/aws/index.html
-https://docs.ansible.com/ansible/latest/collections/community/aws/elb_network_lb_module.html#ansible-collections-community-aws-elb-network-lb-module
-https://docs.ansible.com/ansible/latest/collections/community/aws/elb_target_group_module.html#ansible-collections-community-aws-elb-target-group-module
-https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_security_group_module.html
