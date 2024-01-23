@@ -24,3 +24,12 @@ oc adm policy add-cluster-role-to-user view -z nodeports -n <namespace>
 
 apply nodeports.yaml
 
+connect into the container and run the playbook:
+
+oc rsh nodeports-xxxxx
+
+cd /home/app
+ansible-playbook run.yaml
+
+
+Ideally this should be turned into a cronjob that runs frequently
