@@ -55,13 +55,6 @@ spec:
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-        volumeMounts:
-        - name: inventory
-          mountPath: /home/app/inventories
-      volumes:
-      - name: inventory
-        configMap:
-          name: inventory
       serviceAccount: nodeports
       serviceAccountName: nodeports
       dnsPolicy: ClusterFirst

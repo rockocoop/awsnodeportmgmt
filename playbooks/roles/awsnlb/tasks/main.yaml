@@ -37,11 +37,11 @@
     secret_key: "{{ secret_key }}"
     targets:
       - Id: "{{ worker1 }}"
-        Port: "{{ item }}"
+        Port: "{{ item |int}}"
       - Id: "{{ worker2 }}"
-        Port: "{{ item }}"
+        Port: "{{ item |int }}"
       - Id: "{{ worker3 }}"
-        Port: "{{ item }}"
+        Port: "{{ item |int }}"
     state: present
   loop: "{{ ports.stdout_lines }}"
 
